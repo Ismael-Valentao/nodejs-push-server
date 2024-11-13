@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        Página Inicial
+    </title>
+</head>
+
+<body>
+    <h1>
+        Bem Vindo...
+    </h1>
+    <script>
+        self.addEventListener('install', event => {
+            console.log('Service Worker instalado');
+        });
+
+        self.addEventListener('activate', event => {
+            console.log('Service Worker ativado');
+        });
+
+        async function getVapiKey() {
+            try {
+                const response = await fetch('http://localhost:3000/user/vapid_key');
+                if (!response.ok) {
+                    return alert('Erro...')
+                }
+                const data = await response.json();
+                console.log(data.data['key'])
+                return data['data']['key'];
+            }
+            catch (error) {
+                console.log('Erro: ', error)
+            }
+        }
+
+        async function registToPush(pushSubscription) {
+            try {
+                const response = await fetch('http://localhost:3000/user/push-regist', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(pushSubscription)
+                });
+                console.log(response)
+                const data = await response.json();
+                console.log(data)
+            }
+            catch(error){
+                console.error('Erro: ', error)
+            }
+        }
+
+        (async function () {
+            if ('Notification' in window) {
+                const vapid_key = await getVapiKey();
+
+                Notification.requestPermission()
+                    .then(permission => {
+
+                        if (permission === 'granted') {
+                            if ('serviceWorker' in navigator) {
+                                navigator.serviceWorker.register('/sw.js')
+                                    .then(registration => {
+                                        return registration.pushManager.subscribe({
+                                            userVisibleOnly: true,
+                                            applicationServerKey: vapid_key
+                                        });
+
+                                    }).then(async (pushSubscription) => {
+                                        await registToPush(pushSubscription);
+                                    }).catch(error => {
+                                        console.error('Erro ao inscrever para notificações Push:', error);
+                                    });
+                            }
+                        }
+                        else {
+                            console.log('Refused...')
+                        }
+                    })
+            }
+        })()
+
+
+    </script>
+</body>
+
+</html>

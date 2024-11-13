@@ -1,3 +1,8 @@
+/**
+ * Servidor do front-end
+ * 
+ * Bem simples. Acho que não há muito por dizer...
+ */
 const express   = require('express');
 const path      = require('path');
 

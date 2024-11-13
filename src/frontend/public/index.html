@@ -14,6 +14,7 @@
         Bem Vindo...
     </h1>
     <script>
+        //Alguns listeners para ajudar a ver se o service worker foi instalado/activado ou não.
         self.addEventListener('install', event => {
             console.log('Service Worker instalado');
         });
@@ -22,6 +23,7 @@
             console.log('Service Worker ativado');
         });
 
+        //Método para obter a chave
         async function getVapiKey() {
             try {
                 const response = await fetch('http://localhost:3000/user/vapid_key');
@@ -37,6 +39,7 @@
             }
         }
 
+        //Método para enviar os dados do pushSubscription
         async function registToPush(pushSubscription) {
             try {
                 const response = await fetch('http://localhost:3000/user/push-regist', {
@@ -55,30 +58,32 @@
             }
         }
 
+        //Esta é uma função IFFE. Ela roda imediatamente. Não precisa ser invocada
         (async function () {
-            if ('Notification' in window) {
-                const vapid_key = await getVapiKey();
+            if ('Notification' in window) { //Verifica se o navegador suporta notificações
 
-                Notification.requestPermission()
+                const vapid_key = await getVapiKey(); // Obtém a chave
+
+                Notification.requestPermission() //Pede permissão do usuário
                     .then(permission => {
 
-                        if (permission === 'granted') {
-                            if ('serviceWorker' in navigator) {
-                                navigator.serviceWorker.register('/sw.js')
+                        if (permission === 'granted') { //Se aceitar
+                            if ('serviceWorker' in navigator) { //verifica se é possível registar um service worker
+                                navigator.serviceWorker.register('/sw.js') //Regista
                                     .then(registration => {
                                         return registration.pushManager.subscribe({
                                             userVisibleOnly: true,
-                                            applicationServerKey: vapid_key
+                                            applicationServerKey: vapid_key //Esta é a chave que obtivemos anteriormente
                                         });
 
                                     }).then(async (pushSubscription) => {
-                                        await registToPush(pushSubscription);
+                                        await registToPush(pushSubscription);//Envia o objecto pushSubscription para o server backend
                                     }).catch(error => {
                                         console.error('Erro ao inscrever para notificações Push:', error);
                                     });
                             }
                         }
-                        else {
+                        else { //Se recusar...
                             console.log('Refused...')
                         }
                     })

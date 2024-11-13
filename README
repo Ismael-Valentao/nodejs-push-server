@@ -1,0 +1,19 @@
+Web Push Notifications
+
+Este projeto demonstra como implementar notificações push na web usando Node.js, Express e Service Workers. Push Notifications permitem manter os usuários informados e engajados, mesmo quando não estão navegando ativamente no site.
+
+Descrição
+Push Notifications enviam mensagens diretamente ao navegador do usuário, com suporte para exibição em segundo plano. Esse projeto cobre:
+
+Registro e configuração de um Service Worker.
+Inscrição e autorização do usuário para notificações.
+Envio de notificações push a partir do servidor com suporte para VAPID keys.
+
+Pré-requisitos
+Para executar este projeto, você precisará de:
+
+Node.js instalado em sua máquina.
+VAPID keys para autenticação do servidor.
+Actualizar o ficheiro .env com todos os dados necessários. 
+
+Nota: Veja o ficheiro .env.example e preencha as linhas com seus dados
